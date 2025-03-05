@@ -1,0 +1,16 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "name": "Ronan Sibunga",
+            "age": 45,
+            "email": "ronan.ramos.sibunga@gmail.com"
+        },
+        {
+            "id": 2,
+            "name": "Michiko Sibunga",
+            "age": 45,
+            "email": "michieko.sibunga@emb.gov.ph"
+        }
+    ]
+}
