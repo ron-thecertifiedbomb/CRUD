@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { products } from "./data";
 import { ProductType } from "./type";
 
-const AddProduct: React.FC = () => {
+const AddUser: React.FC = () => {
   
   const [inputName, setInputName] = useState("");
   const [inputCategory, setInputCategory] = useState("");
@@ -140,10 +140,10 @@ const AddProduct: React.FC = () => {
           placeholder="stocks"
           onChange={(e) => handleStockChange(e.target.value)}
         />
-        <button type="submit">Add</button>
+        <button type="submit">Add User</button>
       </form>
     </>
   );
 };
 
-export default AddProduct;
+export default AddUser;

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 
-interface User { id: number; name: string; email: string; }
+interface User { id: number; name: string; email: string; age: number }
 
 const UsersList: React.FC = () => {
+
     const [users, setUsers] = useState<User[]>([]);
 
     const fetchUsers = async () => {
@@ -35,16 +36,45 @@ const UsersList: React.FC = () => {
     useEffect(() => { fetchUsers(); }, []);
 
     return (
-        <>
-            <h2>Users List</h2>
-            {users.map(user => (
-                <React.Fragment key={user.id}>
-                    <p>name: {user.name}</p>
-                    <p>email: {user.email}</p>
-                    <button onClick={() => deleteUser(user.id)}>Delete</button>
-                </React.Fragment>
-            ))}
-        </>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <h2 style={{ textAlign: "center", marginBottom: 30 }}>List of Users</h2>
+        {users.map((user) => (
+          <React.Fragment key={user.id}>
+            <p>Name: {user.name}</p>
+            <p>Email Address: {user.email}</p>
+            <p>Age: {user.age}</p>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                        marginBottom: 20,
+                        
+                paddingRight: 10,
+              }}
+            >
+              <p style={{ textAlign: "end", fontWeight: 500 }}>Delete User</p>
+              <button
+                onClick={() => deleteUser(user.id)}
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "red",
+                  color: "white",
+                  width: 25,
+                  height: 25,
+                  borderRadius: 20,
+                  border: "none",
+                  cursor: "pointer",
+                }}
+              >
+                X
+              </button>
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
     );
 };
 

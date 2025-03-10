@@ -1,5 +1,6 @@
-import AddProduct from "./AddProduct";
-import "./App.css";
+
+import UsersList from "./User";
+
 
 function App() {
   return (
@@ -13,7 +14,7 @@ function App() {
         display: 'flex',
       }}
     >
-      <AddProduct />
+      <UsersList />
     </div>
   );
 }
