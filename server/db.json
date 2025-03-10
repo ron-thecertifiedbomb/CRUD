@@ -1,16 +1,28 @@
 {
-    "users": [
-        {
-            "id": 1,
-            "name": "Ronan Sibunga",
-            "age": 45,
-            "email": "ronan.ramos.sibunga@gmail.com"
-        },
-        {
-            "id": 2,
-            "name": "Michiko Sibunga",
-            "age": 45,
-            "email": "michieko.sibunga@emb.gov.ph"
-        }
-    ]
+  "users": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "johndoe@example.com",
+      "age": 28
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "email": "janesmith@example.com",
+      "age": 25
+    },
+    {
+      "id": 3,
+      "name": "Alice Johnson",
+      "email": "alicejohnson@example.com",
+      "age": 30
+    },
+    {
+      "id": 4,
+      "name": "Bob Brown",
+      "email": "bobbrown@example.com",
+      "age": 35
+    }
+  ]
 }
