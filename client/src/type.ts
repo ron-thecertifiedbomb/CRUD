@@ -1,20 +1,17 @@
 export interface User {
-    name: string;
-    address: string;
-
+    id: number 
+    name: string 
+    email: string 
+    age: number | string 
 }
 
-export interface UserNew extends User {
-  email: string;
-} 
 
 
 
-
-export type UserType = {
+export type UserPayload = {
     name: string;
-    address: string;
     email: string;
+   age: number | string
 
 }
 

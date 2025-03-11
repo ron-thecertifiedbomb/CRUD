@@ -1,27 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction} from "react";
+import { User, UserPayload } from "./type";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  age: number;
+interface UsersListProps {
+  setUserId: (id: number | null) => void;
+  users: User[];
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
+  setSelectedUser: Dispatch<SetStateAction<UserPayload | undefined>>;
 }
 
-const UsersList: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
 
-  const fetchUsers = async () => {
-    try {
-      const response = await fetch(
-        "https://node-server-d14o.onrender.com/api/users"
-      );
-      const data: User[] = await response.json();
-      setUsers(data);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
-
+const UsersList: React.FC<UsersListProps> = ({
+  users,
+  setSelectedUser,
+  setUserId,
+  setIsOpen,
+}) => {
   const deleteUser = async (id: number) => {
     try {
       const response = await fetch(
@@ -30,11 +23,9 @@ const UsersList: React.FC = () => {
           method: "DELETE",
         }
       );
- console.log("id", id);
       if (response.ok) {
         const result = await response.json(); // Call response.json()
         console.log(result); // Log the success message from the server
-        setUsers(users.filter((user) => user.id !== id));
       } else {
         console.error("Failed to delete user");
       }
@@ -43,9 +34,27 @@ const UsersList: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const getUser = async (id: number | null) => {
+    try {
+      const response = await fetch(
+        `https://node-server-d14o.onrender.com/api/user/${id}`
+      );
+
+      if (response.ok) {
+        const user = await response.json();
+        setSelectedUser(user);
+        setIsOpen(true);
+        return user;
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
+  const handleGetUserID = (id: number) => {
+    setUserId(id);
+    getUser(id);
+  };
 
   return (
     <div
@@ -58,7 +67,7 @@ const UsersList: React.FC = () => {
       }}
     >
       <h2 style={{ textAlign: "center", marginBottom: 20 }}>List of Users</h2>
-      {users.map((user) => (
+      {users?.map((user) => (
         <React.Fragment key={user.id}>
           <p>Name: {user.name}</p>
           <p>Email Address: {user.email}</p>
@@ -74,6 +83,22 @@ const UsersList: React.FC = () => {
             }}
           >
             <p style={{ textAlign: "end", fontWeight: 500 }}>Delete User</p>
+            <button
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: "black",
+                color: "white",
+                padding: 8,
+                borderRadius: 15,
+                border: "none",
+                cursor: "pointer",
+              }}
+              onClick={() => handleGetUserID(user.id)}
+            >
+              <p style={{ fontSize: 12 }}>Update</p>
+            </button>
             <button
               onClick={() => deleteUser(user.id)}
               style={{

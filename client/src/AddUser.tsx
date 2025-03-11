@@ -1,111 +1,100 @@
-import React, { useState, useRef, useEffect } from "react";
-import { products } from "./data";
-import { ProductType } from "./type";
+import React, { useState, useRef, useEffect, SetStateAction, Dispatch } from "react";
+import { UserPayload } from "./type";
 
-const AddUser: React.FC = () => {
-  
+type AddUserProps = {
+  addModal: boolean;
+  setAddModal: Dispatch<SetStateAction<boolean>>;
+};
+
+const AddUser: React.FC<AddUserProps> = ({ addModal, setAddModal }) => {
   const [inputName, setInputName] = useState("");
-  const [inputCategory, setInputCategory] = useState("");
-  const [inputPrice, setInputPrice] = useState<number | "">("");
-  const [inputStocks, setInputStocks] = useState<number | "">("");
-  const [productlist, setProducts] = useState<ProductType[]>(products);
-
-  const cheapProducts = productlist.filter((product) => {
-    const price = Number(product.price);
-    return price > 100 && price < 500;
-  });
-
-  console.log("Cheap", cheapProducts);
+  const [inputEmail, setInputEmail] = useState("");
+  const [inputAge, setInputAge] = useState<number | "">("");
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const focusInput = () => {
+useEffect(() => {
+  if (addModal) {
     inputRef.current?.focus();
-  };
-
-  useEffect(() => focusInput(), []);
-
-  const handleClickOutside = (event: MouseEvent) => {
-    if (
-      inputRef.current &&
-      !inputRef.current.contains(event.target as Node) &&
-      !(event.target as HTMLElement).closest("input")
-    ) {
-      inputRef.current.focus();
-    }
-  };
-  useEffect(() => {
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
-
+  }
+}, [addModal]);
+  
   const handleNameChange = (value: string) => {
     setInputName(value);
   };
 
-  const handleCategoryChange = (value: string) => {
-    setInputCategory(value);
+  const handleEmailChange = (value: string) => {
+    setInputEmail(value);
   };
 
-  const handlePriceChange = (value: string) => {
+  const handleAgeChange = (value: string) => {
     const numericValue = Number(value);
     if (value === "") {
-      setInputPrice("");
+      setInputAge("");
     } else if (!isNaN(numericValue) && numericValue >= 0) {
-      setInputPrice(numericValue);
+      setInputAge(numericValue);
     }
   };
 
-  const handleStockChange = (value: string) => {
-    const numericValue = Number(value);
-    console.log("Variable type", typeof numericValue);
-    if (value === "") {
-      setInputStocks("");
-    } else if (!isNaN(numericValue) && numericValue >= 0) {
-      setInputStocks(numericValue);
+  const addUser = async () => {
+    const payLoad: UserPayload = {
+      name: inputName,
+      email: inputEmail,
+      age: inputAge,
+    };
+
+    try {
+      const response = await fetch(
+        "https://node-server-d14o.onrender.com/api/users",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payLoad),
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to add user:", response.statusText);
+        return null;
+      }
+      const data = await response.json();
+        
+      console.log("Successfully added user:", data);
+      
+      setInputName("");
+      setInputEmail("");
+      setInputAge("");
+   setTimeout(() => {
+     setAddModal(false);
+   }, 300); 
+      return data;
+    } catch (error) {
+      console.error("Error adding user:", error);
+      return null;
     }
   };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    const payLoad: ProductType = {
-      productName: inputName,
-      category: inputCategory,
-      price: inputPrice,
-      stocks: inputStocks,
-    };
-
-    const fields: Record<string, string | number> = {
-      ProductName: payLoad.productName,
-      Category: payLoad.category,
-      Price: payLoad.price,
-      Stocks: payLoad.stocks,
-    };
-
-    const missingFields: string[] = [];
-
-    Object.entries(fields).forEach(([key, value]) => {
-      if (!value) missingFields.push(key);
-    });
-
-    if (missingFields.length > 0) {
-      console.log(
-        "Please fill in the following fields:",
-        missingFields.join(", ")
-      );
-      return;
-    }
-    setProducts((prevProducts) => [payLoad, ...prevProducts]);
-    setInputName("");
-    setInputPrice("");
-    setInputCategory("");
-    setInputStocks("");
+    addUser();
   };
 
   return (
-    <>
+    <div
+      style={{
+        display: addModal ? "flex" : "none",
+        zIndex: 99,
+        height: "100vh",
+        width: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        position: "absolute",
+        backgroundColor: "black",
+        opacity: 0.9,
+        flexDirection: "column",
+        gap: 10
+      }}
+    >
       <form
         onSubmit={handleSubmit}
         style={{
@@ -119,30 +108,32 @@ const AddUser: React.FC = () => {
           name="name"
           value={inputName}
           ref={inputRef}
-          placeholder="product"
+          placeholder="name"
           onChange={(e) => handleNameChange(e.target.value)}
         />
         <input
-          name="category"
-          value={inputCategory}
-          placeholder="category"
-          onChange={(e) => handleCategoryChange(e.target.value)}
+          name="email"
+          value={inputEmail}
+          placeholder="email"
+          onChange={(e) => handleEmailChange(e.target.value)}
         />
         <input
-          name="price"
-          value={inputPrice}
-          placeholder="price"
-          onChange={(e) => handlePriceChange(e.target.value)}
+          name="age"
+          value={inputAge}
+          placeholder="age"
+          onChange={(e) => handleAgeChange(e.target.value)}
         />
-        <input
-          name="stocks"
-          value={inputStocks}
-          placeholder="stocks"
-          onChange={(e) => handleStockChange(e.target.value)}
-        />
+
         <button type="submit">Add User</button>
       </form>
-    </>
+      <button
+        onClick={() => {
+          setAddModal(true);
+        }}
+      >
+        Close Form
+      </button>
+    </div>
   );
 };
 
