@@ -5,33 +5,29 @@ import React, {
   SetStateAction,
   Dispatch,
 } from "react";
-import { UserPayload } from "./src/type";
+import { User, UserPayload } from "./type";
+import { fetchApi } from "./service/fetchApi";
 
-interface UpdateFormProps {
+interface UpdateUserFormProps {
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   isOpen: boolean;
   userId: number | null;
   selectedUser: UserPayload | undefined;
 }
 
-const UpdateForm: React.FC<UpdateFormProps> = ({
+const UpdateUserForm: React.FC<UpdateUserFormProps> = ({
   isOpen,
   userId,
   setIsOpen,
   selectedUser,
 }) => {
-  // Ensure default values for controlled inputs
   const defaultUser: UserPayload = { name: "", email: "", age: 0 };
   const user = selectedUser ?? defaultUser;
-
   const [inputName, setInputName] = useState(user.name);
   const [inputEmail, setInputEmail] = useState(user.email);
   const [inputAge, setInputAge] = useState(user.age);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-
-
-  // Update state when selectedUser changes
   useEffect(() => {
     if (selectedUser) {
       setInputName(selectedUser.name);
@@ -39,8 +35,6 @@ const UpdateForm: React.FC<UpdateFormProps> = ({
       setInputAge(selectedUser.age);
     }
   }, [selectedUser]);
-
-
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -63,30 +57,20 @@ const UpdateForm: React.FC<UpdateFormProps> = ({
     }
   };
 
+  const payload: User = {
+    name: inputName,
+    email: inputEmail,
+    age: inputAge,
+  };
+
   const updateUser = async () => {
     try {
-      const response = await fetch(
-        `https://node-server-d14o.onrender.com/api/user/${userId}`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: inputName,
-            email: inputEmail,
-            age: inputAge,
-          }),
-        }
+      const response = await fetchApi(
+        `https://node-server-d14o.onrender.com/api/user/${userId}`, 'PUT',
+        payload
       );
-      if (response.ok) {
-        const result = await response.json();
-   
-      setTimeout(() => {
+      console.log(response);
       setIsOpen(false);
-      }, 200);          
-          return result;
-      } else {
-        console.error("Failed to update user");
-      }
     } catch (error) {
       console.error("Error updating user:", error);
     }
@@ -122,28 +106,22 @@ const UpdateForm: React.FC<UpdateFormProps> = ({
       >
         <input
           name="name"
-        
           value={inputName}
           ref={inputRef}
           placeholder="Name"
           onChange={(e) => updateNameChange(e.target.value)}
-        
         />
         <input
           name="email"
-    
           value={inputEmail}
           placeholder="Email"
           onChange={(e) => updateEmailChange(e.target.value)}
-     
         />
         <input
           name="age"
-         
           value={inputAge}
           placeholder="Age"
           onChange={(e) => updateAgeChange(e.target.value)}
-
         />
 
         <button type="submit">Update User</button>
@@ -152,4 +130,4 @@ const UpdateForm: React.FC<UpdateFormProps> = ({
   );
 };
 
-export default UpdateForm;
+export default UpdateUserForm;

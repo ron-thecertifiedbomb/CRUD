@@ -1,33 +1,38 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AddUser from "./AddUser";
 import UsersList from "./UserList";
-import UpdateForm from "../UpdateForm";
-import { User, UserPayload } from "./type";
+import UpdateForm from "./UpdateUserForm";
+import { User } from "./type";
+import { fetchApi } from "./service/fetchApi";
 
 function App() {
   const [userId, setUserId] = useState<number | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
- const [selectedUser, setSelectedUser] = useState<UserPayload | undefined>(
-   undefined
- );
-
+const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
   const [isOpen, setIsOpen] = useState<boolean>(false);
- const [addModal, setAddModal] = useState<boolean>(false);
-    const fetchUsers = useCallback(async () => {
-      try {
-        const response = await fetch(
-          "https://node-server-d14o.onrender.com/api/users"
-        );
-        const data = await response.json();
-        setUsers(data);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    }, [setUsers]);
-  
-    useEffect(() => {
-      fetchUsers();
-    }, [fetchUsers, users]);
+  const [addModal, setAddModal] = useState<boolean>(false);
+
+const fetchUsers = async () => {
+  try {
+    const response = await fetchApi(
+      "https://node-server-d14o.onrender.com/api/users",
+      "GET"
+    );
+    if (response && Array.isArray(response)) {
+      const data: User[] = response;
+      console.log("Data:", data);
+      setUsers(data); // Set users in state
+    } else {
+      console.error("Response is not an array of users:", response);
+    }
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+};
+
+  useEffect(() => {
+    fetchUsers();
+  }, [isOpen, addModal]);
 
   return (
     <div
@@ -38,7 +43,7 @@ function App() {
         alignItems: "center",
         justifyContent: "center",
         display: "flex",
-        flexDirection: 'column'
+        flexDirection: "column",
       }}
     >
       <>
@@ -48,7 +53,14 @@ function App() {
           setUserId={setUserId}
           setIsOpen={setIsOpen}
         />
-        <button onClick={() => {setAddModal(true)}}> Add Users</button>
+        <button
+          onClick={() => {
+            setAddModal(true);
+          }}
+        >
+          {" "}
+          Add Users
+        </button>
         <AddUser addModal={addModal} setAddModal={setAddModal} />
         <UpdateForm
           isOpen={isOpen}

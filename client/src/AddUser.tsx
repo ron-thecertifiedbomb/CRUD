@@ -1,5 +1,12 @@
-import React, { useState, useRef, useEffect, SetStateAction, Dispatch } from "react";
-import { UserPayload } from "./type";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  SetStateAction,
+  Dispatch,
+} from "react";
+import { User } from "./type";
+import { fetchApi } from "./service/fetchApi";
 
 type AddUserProps = {
   addModal: boolean;
@@ -13,12 +20,12 @@ const AddUser: React.FC<AddUserProps> = ({ addModal, setAddModal }) => {
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-useEffect(() => {
-  if (addModal) {
-    inputRef.current?.focus();
-  }
-}, [addModal]);
-  
+  useEffect(() => {
+    if (addModal) {
+      inputRef.current?.focus();
+    }
+  }, [addModal]);
+
   const handleNameChange = (value: string) => {
     setInputName(value);
   };
@@ -37,36 +44,32 @@ useEffect(() => {
   };
 
   const addUser = async () => {
-    const payLoad: UserPayload = {
+    const payLoad: User = {
       name: inputName,
       email: inputEmail,
       age: inputAge,
     };
 
     try {
-      const response = await fetch(
+      const response = await fetchApi(
         "https://node-server-d14o.onrender.com/api/users",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payLoad),
-        }
+        "POST",
+        payLoad
       );
 
-      if (!response.ok) {
-        console.error("Failed to add user:", response.statusText);
+      if (!response) {
+        console.error("Failed to add user:", response);
         return null;
       }
-      const data = await response.json();
-        
-      console.log("Successfully added user:", data);
-      
+      const data = response;
+      console.log("Successfully added user:", response);
+
       setInputName("");
       setInputEmail("");
       setInputAge("");
-   setTimeout(() => {
-     setAddModal(false);
-   }, 300); 
+      setTimeout(() => {
+        setAddModal(false);
+      }, 300);
       return data;
     } catch (error) {
       console.error("Error adding user:", error);
@@ -92,7 +95,7 @@ useEffect(() => {
         backgroundColor: "black",
         opacity: 0.9,
         flexDirection: "column",
-        gap: 10
+        gap: 10,
       }}
     >
       <form

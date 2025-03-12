@@ -15,7 +15,7 @@ const UsersList: React.FC<UsersListProps> = ({
   setUserId,
   setIsOpen,
 }) => {
-  const deleteUser = async (id: number) => {
+  const deleteUser = async (id?: number) => {
     try {
       const response = await fetch(
         `https://node-server-d14o.onrender.com/api/user/${id}`,
@@ -51,9 +51,9 @@ const UsersList: React.FC<UsersListProps> = ({
     }
   };
 
-  const handleGetUserID = (id: number) => {
-    setUserId(id);
-    getUser(id);
+  const handleGetUserID = (id?: number) => {
+    setUserId(id ?? null); // Convert undefined to null
+    getUser(id ?? null); // Convert undefined to null
   };
 
   return (

@@ -1,10 +1,15 @@
 export interface User {
-    id: number 
+     id?: number; 
     name: string 
     email: string 
     age: number | string 
 }
 
+export interface ApiResponse {
+  success: boolean;
+  data: User[];
+  message?: string;
+}
 
 
 
