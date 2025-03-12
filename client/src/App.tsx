@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AddUser from "./AddUser";
 import UsersList from "./UserList";
 import UpdateForm from "./UpdateUserForm";
@@ -13,28 +13,31 @@ const [users, setUsers] = useState<User[]>([]);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [addModal, setAddModal] = useState<boolean>(false);
 
-const fetchUsers = async () => {
+
+
+const fetchUsers = useCallback(async () => {
   try {
     const response = await fetchApi(
       "https://node-server-d14o.onrender.com/api/users",
       "GET"
     );
     if (response && Array.isArray(response)) {
-      const data: User[] = response;
-      console.log("Data:", data);
-      setUsers(data); // Set users in state
+      setUsers((prevUsers) =>
+        JSON.stringify(prevUsers) !== JSON.stringify(response)
+          ? response
+          : prevUsers
+      );
     } else {
       console.error("Response is not an array of users:", response);
     }
   } catch (error) {
     console.error("Error fetching users:", error);
   }
-};
+}, []); // Stable function reference
 
-  useEffect(() => {
-    fetchUsers();
-  }, [isOpen, addModal]);
-
+useEffect(() => {
+  fetchUsers();
+}, [fetchUsers, isOpen, addModal, users]);
   return (
     <div
       style={{
@@ -53,6 +56,7 @@ const fetchUsers = async () => {
           setSelectedUser={setSelectedUser}
           setUserId={setUserId}
           setIsOpen={setIsOpen}
+          setUsers={setUsers}
         />
         <button
           onClick={() => {

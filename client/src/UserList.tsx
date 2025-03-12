@@ -1,31 +1,31 @@
-import React, { Dispatch, SetStateAction} from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { User, UserPayload } from "./type";
+import { fetchApi } from "./service/fetchApi";
 
 interface UsersListProps {
   setUserId: (id: number | null) => void;
+  setUsers: Dispatch<SetStateAction<User[]>>;
   users: User[];
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   setSelectedUser: Dispatch<SetStateAction<UserPayload | undefined>>;
 }
 
-
 const UsersList: React.FC<UsersListProps> = ({
   users,
+  setUsers,
   setSelectedUser,
   setUserId,
   setIsOpen,
 }) => {
-  const deleteUser = async (id?: number) => {
+  const handleDeleteUser = async (id?: number) => {
     try {
-      const response = await fetch(
+      const response = await fetchApi(
         `https://node-server-d14o.onrender.com/api/user/${id}`,
-        {
-          method: "DELETE",
-        }
+        "DELETE"
       );
-      if (response.ok) {
-        const result = await response.json(); // Call response.json()
-        console.log(result); // Log the success message from the server
+
+      if (response) {
+        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
       } else {
         console.error("Failed to delete user");
       }
@@ -35,6 +35,11 @@ const UsersList: React.FC<UsersListProps> = ({
   };
 
   const getUser = async (id: number | null) => {
+    if (id === null) {
+      console.error("Error: User ID is null");
+      return;
+    }
+
     try {
       const response = await fetch(
         `https://node-server-d14o.onrender.com/api/user/${id}`
@@ -45,15 +50,17 @@ const UsersList: React.FC<UsersListProps> = ({
         setSelectedUser(user);
         setIsOpen(true);
         return user;
+      } else {
+        console.error("Error: Failed to fetch user data");
       }
     } catch (error) {
       console.error("Error fetching users:", error);
     }
   };
 
-  const handleGetUserID = (id?: number) => {
+  const handleGetUserID = (id: number | undefined) => {
     setUserId(id ?? null); // Convert undefined to null
-    getUser(id ?? null); // Convert undefined to null
+    getUser(id ?? null);
   };
 
   return (
@@ -100,7 +107,7 @@ const UsersList: React.FC<UsersListProps> = ({
               <p style={{ fontSize: 12 }}>Update</p>
             </button>
             <button
-              onClick={() => deleteUser(user.id)}
+              onClick={() => handleDeleteUser(user.id)}
               style={{
                 display: "flex",
                 justifyContent: "center",
