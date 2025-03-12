@@ -69,7 +69,7 @@ const AddUser: React.FC<AddUserProps> = ({ addModal, setAddModal }) => {
       setInputAge("");
       setTimeout(() => {
         setAddModal(false);
-      }, 300);
+      }, 400);
       return data;
     } catch (error) {
       console.error("Error adding user:", error);

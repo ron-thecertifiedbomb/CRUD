@@ -1,16 +1,10 @@
-import { User } from "../type";
-
-// If your response contains different structure, such as a simple list or object
-
-
-export const fetchApi = async (
+export const fetchApi = async <T,>(
   url: string,
-  method: string = "GET", // Default method is GET
-  payload?: User
-): Promise<User | User[]> => {
+  method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
+  payload?: unknown
+): Promise<T> => {
   const headers = { "Content-Type": "application/json" };
 
-  // Prepare body only if method requires it (i.e., not GET or DELETE)
   const body =
     method !== "GET" && method !== "DELETE" && payload
       ? JSON.stringify(payload)
@@ -18,26 +12,17 @@ export const fetchApi = async (
 
   try {
     const response = await fetch(url, {
-      method: method,
-      headers: headers,
-      body: body,
+      method,
+      headers,
+      body,
     });
 
-    // Check for response status and parse JSON using response.json()
-    const responseJson = await response.json();
-
-    console.log("Response status:", response.status);
-    console.log("Response body:", responseJson);
-
-    // Check if the response status is OK
     if (!response.ok) {
       throw new Error(`Failed to fetch: ${response.statusText}`);
     }
 
-    // Return the parsed JSON response
-    return responseJson;
+    return response.json() as Promise<T>; // Ensure TypeScript knows the response type
   } catch (error) {
-    // Log error in case of network issues or other unexpected issues
     throw new Error(`Error in fetch: ${error}`);
   }
 };

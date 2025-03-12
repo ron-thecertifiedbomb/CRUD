@@ -4,6 +4,7 @@ import UsersList from "./UserList";
 import UpdateForm from "./UpdateUserForm";
 import { User } from "./type";
 import { fetchApi } from "./service/fetchApi";
+import QrCodeGenerator from "./components/QrCodeGenerator/QrCodeGenerator";
 
 function App() {
   const [userId, setUserId] = useState<number | null>(null);
@@ -61,6 +62,7 @@ const fetchUsers = async () => {
           {" "}
           Add Users
         </button>
+        <QrCodeGenerator />
         <AddUser addModal={addModal} setAddModal={setAddModal} />
         <UpdateForm
           isOpen={isOpen}

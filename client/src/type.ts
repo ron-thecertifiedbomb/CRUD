@@ -11,6 +11,13 @@ export interface ApiResponse {
   message?: string;
 }
 
+export interface QrResponse {
+
+    qrCode: string;
+
+}
+
+
 
 
 export type UserPayload = {
